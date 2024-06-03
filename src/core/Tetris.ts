@@ -2,54 +2,101 @@ import {Point, Shape} from "./types";
 import {getRandom} from "./util";
 import {SquareGroup} from "./SquareGroup";
 
-export const TShape: Shape = [
-    {x: -1, y: 0},
-    {x: 0, y: 0},
-    {x: 0, y: 1},
-    {x: 0, y: -1},
-];
+export class TShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: -1, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: 1},
+            {x: 0, y: -1},
+        ], _centerPoint, _color);
+    }
+}
 
-export const LShape: Shape = [
-    {x: -2, y: 0},
-    {x: -1, y: 0},
-    {x: 0, y: 0},
-    {x: 0, y: -1},
-];
+export class LShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: -2, y: 0},
+            {x: -1, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: -1},
+        ], _centerPoint, _color);
+    }
+}
 
-export const LMirrorShape: Shape = [
-    {x: 2, y: 0},
-    {x: 1, y: 0},
-    {x: 0, y: 0},
-    {x: 0, y: -1},
-];
+export class LMirrorShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: 2, y: 0},
+            {x: 1, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: -1},
+        ], _centerPoint, _color);
+    }
+}
 
-export const SShape: Shape = [
-    {x: 0, y: 0},
-    {x: 1, y: 0},
-    {x: 0, y: 1},
-    {x: -1, y: 1},
-];
+export class SShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: 0, y: 0},
+            {x: 1, y: 0},
+            {x: 0, y: 1},
+            {x: -1, y: 1},
+        ], _centerPoint, _color);
+    }
 
-export const SMirrorShape: Shape = [
-    {x: 0, y: 0},
-    {x: -1, y: 0},
-    {x: 0, y: 1},
-    {x: 1, y: 1},
-];
+    rotate() {
+        super.rotate();
+        this.isClock = !this.isClock;
+    }
+}
 
-export const SquareShape: Shape = [
-    {x: 0, y: 0},
-    {x: 1, y: 0},
-    {x: 0, y: 1},
-    {x: 1, y: 1},
-];
+export class SMirrorShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: 0, y: 0},
+            {x: -1, y: 0},
+            {x: 0, y: 1},
+            {x: 1, y: 1},
+        ], _centerPoint, _color);
+    }
 
-export const LineShape: Shape = [
-    {x: -1, y: 0},
-    {x: 0, y: 0},
-    {x: 0, y: 1},
-    {x: 0, y: 2},
-];
+    rotate() {
+        super.rotate();
+        this.isClock = !this.isClock;
+    }
+}
+
+export class SquareShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: 0, y: 0},
+            {x: 1, y: 0},
+            {x: 0, y: 1},
+            {x: 1, y: 1},
+        ], _centerPoint, _color);
+    }
+
+    afterRotateShape(): Shape {
+        return this.shape;
+    }
+}
+
+export class LineShape extends SquareGroup {
+    constructor(_centerPoint: Point, _color: string) {
+        super([
+            {x: -1, y: 0},
+            {x: 0, y: 0},
+            {x: 1, y: 0},
+            {x: 2, y: 0},
+        ], _centerPoint, _color);
+    }
+
+    rotate() {
+        super.rotate();
+        this.isClock = !this.isClock;
+    }
+}
 
 export const shapes = [
     TShape,
@@ -69,12 +116,13 @@ export const colors = [
     'orange',
 ];
 
-export function createTetris(centerPoint: Point) {
+export function createTetris(centerPoint: Point): SquareGroup {
     let index = getRandom(0, shapes.length);
     const shape = shapes[index];
 
     index = getRandom(0, colors.length);
     const color = colors[index];
 
-    return new SquareGroup(shape, centerPoint, color);
+    console.log(shape.name)
+    return new shape(centerPoint, color);
 }

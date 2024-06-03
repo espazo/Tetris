@@ -35,3 +35,7 @@ $('#right').click(() => {
         y: tetris.centerPoint.y,
     };
 });
+
+$('#rotate').click(() => {
+    tetris.rotate();
+});
