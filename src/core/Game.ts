@@ -101,6 +101,7 @@ export class Game {
 
     private hitBottom() {
         this._exists.push(...this._curTetris!.squares);
+        const num = TetrisRule.deleteSquares(this._exists);
         this.switchTetris();
     }
 }

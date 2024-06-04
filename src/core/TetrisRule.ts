@@ -76,4 +76,43 @@ export class TetrisRule {
             return false;
         }
     }
+
+    private static getLineSquare(exists: Square[], y: number) {
+        return exists.filter(sq => sq.point.y == y);
+    }
+
+    static deleteSquares(exists: Square[]): number {
+        const ys = exists.map(sq => sq.point.y);
+        const maxY = Math.max(...ys);
+        const minY = Math.min(...ys);
+
+        let num = 0;
+        for (let y = minY; y <= maxY; y++) {
+            if (this.deleteLine(exists, y)) {
+                num++;
+            }
+        }
+
+        return num;
+    }
+
+    private static deleteLine(exists: Square[], y: number): boolean {
+        const squares = this.getLineSquare(exists, y);
+        if (squares.length == GameConfig.panelSize.width) {
+            squares.map(sq => {
+                sq.viewer?.remove()
+                exists.filter(sq => sq.point.y < y).forEach(sq => {
+                    sq.point = {
+                        x: sq.point.x,
+                        y: sq.point.y + 1,
+                    };
+                });
+                const index = exists.indexOf(sq);
+                exists.splice(index, 1);
+            });
+            return true;
+        }
+
+        return false;
+    }
 }
