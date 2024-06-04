@@ -101,14 +101,14 @@ export class TetrisRule {
         if (squares.length == GameConfig.panelSize.width) {
             squares.map(sq => {
                 sq.viewer?.remove()
-                exists.filter(sq => sq.point.y < y).forEach(sq => {
-                    sq.point = {
-                        x: sq.point.x,
-                        y: sq.point.y + 1,
-                    };
-                });
                 const index = exists.indexOf(sq);
                 exists.splice(index, 1);
+            });
+            exists.filter(sq => sq.point.y < y).forEach(sq => {
+                sq.point = {
+                    x: sq.point.x,
+                    y: sq.point.y + 1,
+                };
             });
             return true;
         }
