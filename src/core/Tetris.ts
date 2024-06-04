@@ -110,7 +110,6 @@ export const shapes = [
 
 export const colors = [
     'red',
-    'white',
     'green',
     'blue',
     'orange',
