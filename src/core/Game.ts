@@ -3,6 +3,7 @@ import {SquareGroup} from "./SquareGroup";
 import {createTetris} from "./Tetris";
 import {TetrisRule} from "./TetrisRule";
 import GameConfig from "./GameConfig";
+import {Square} from "./Square";
 
 export class Game {
     private _gameStatus: GameStatus = GameStatus.init;
@@ -10,6 +11,7 @@ export class Game {
     private _nextTetris: SquareGroup = createTetris({x: 0, y: 0});
     private _timer?: number;
     private _during: number = 1000;
+    private _exists: Square[] = [];
 
     constructor(private _viewer: IGameViewer) {
         this.resetCenterPoint(GameConfig.nextSize.width, this._nextTetris);
@@ -37,25 +39,26 @@ export class Game {
 
     controlLeft() {
         if (this._curTetris && this._gameStatus == GameStatus.playing) {
-            TetrisRule.move(this._curTetris, MoveDirection.left);
+            TetrisRule.move(this._curTetris, MoveDirection.left, this._exists);
         }
     }
 
     controlRight() {
         if (this._curTetris && this._gameStatus == GameStatus.playing) {
-            TetrisRule.move(this._curTetris, MoveDirection.right);
+            TetrisRule.move(this._curTetris, MoveDirection.right, this._exists);
         }
     }
 
     controlDown() {
         if (this._curTetris && this._gameStatus == GameStatus.playing) {
-            TetrisRule.moveDirectly(this._curTetris, MoveDirection.down);
+            TetrisRule.moveDirectly(this._curTetris, MoveDirection.down, this._exists);
+            this.hitBottom();
         }
     }
 
     controlRotate() {
         if (this._curTetris && this._gameStatus == GameStatus.playing) {
-            TetrisRule.rotate(this._curTetris);
+            TetrisRule.rotate(this._curTetris, this._exists);
         }
     }
 
@@ -65,7 +68,10 @@ export class Game {
         }
         this._timer = setInterval(() => {
             if (this._curTetris) {
-                TetrisRule.move(this._curTetris!, MoveDirection.down);
+                const isHitBottom = !TetrisRule.move(this._curTetris!, MoveDirection.down, this._exists);
+                if (isHitBottom) {
+                    this.hitBottom();
+                }
             }
         }, this._during) as unknown as number;
     }
@@ -91,5 +97,10 @@ export class Game {
                 },
             );
         }
+    }
+
+    private hitBottom() {
+        this._exists.push(...this._curTetris!.squares);
+        this.switchTetris();
     }
 }

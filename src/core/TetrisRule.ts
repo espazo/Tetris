@@ -1,6 +1,7 @@
 import {MoveDirection, Point, Shape} from "./types";
 import GameConfig from "./GameConfig";
 import {SquareGroup} from "./SquareGroup";
+import {Square} from "./Square";
 
 function isPoint(obj: any): obj is Point {
     return !(typeof obj.x == 'undefined' || typeof obj.y == 'undefined');
@@ -8,7 +9,7 @@ function isPoint(obj: any): obj is Point {
 }
 
 export class TetrisRule {
-    static canIMove(shape: Shape, targetPoint: Point): boolean {
+    static canIMove(shape: Shape, targetPoint: Point, exists: Square[]): boolean {
         const targetSquarePoints: Point[] = shape.map(it => {
             return {
                 x: it.x + targetPoint.x,
@@ -16,16 +17,22 @@ export class TetrisRule {
             };
         });
 
-        return !targetSquarePoints.some(p => {
+        const isOut = targetSquarePoints.some(p => {
             return p.x < 0 || p.x > GameConfig.panelSize.width - 1 || p.y < 0 || p.y > GameConfig.panelSize.height - 1;
         });
+
+        const isInclude = targetSquarePoints.some(p =>
+            exists.some(sq => sq.point.x == p.x && sq.point.y == p.y)
+        );
+
+        return !(isOut || isInclude);
     }
 
-    static move(tetris: SquareGroup, targetPoint: Point): boolean;
-    static move(tetris: SquareGroup, direction: MoveDirection): boolean;
-    static move(tetris: SquareGroup, targetPointOrDirection: Point | MoveDirection): boolean {
+    static move(tetris: SquareGroup, targetPoint: Point, exists: Square[]): boolean;
+    static move(tetris: SquareGroup, direction: MoveDirection, exists: Square[]): boolean;
+    static move(tetris: SquareGroup, targetPointOrDirection: Point | MoveDirection, exists: Square[]): boolean {
         if (isPoint(targetPointOrDirection)) {
-            const result = TetrisRule.canIMove(tetris.shape, targetPointOrDirection);
+            const result = TetrisRule.canIMove(tetris.shape, targetPointOrDirection, exists);
             if (result) {
                 tetris.centerPoint = targetPointOrDirection;
             }
@@ -51,18 +58,18 @@ export class TetrisRule {
                 };
             }
 
-            return this.move(tetris, targetPoint!);
+            return this.move(tetris, targetPoint!, exists);
         }
     }
 
-    static moveDirectly(tetirs: SquareGroup, direction: MoveDirection) {
-        while (this.move(tetirs, direction)) {
+    static moveDirectly(tetirs: SquareGroup, direction: MoveDirection, exists: Square[]) {
+        while (this.move(tetirs, direction, exists)) {
         }
     }
 
-    static rotate(tetris: SquareGroup): boolean {
+    static rotate(tetris: SquareGroup, exists: Square[]): boolean {
         const newShape = tetris.afterRotateShape();
-        if (this.canIMove(newShape, tetris.centerPoint)) {
+        if (this.canIMove(newShape, tetris.centerPoint, exists)) {
             tetris.rotate();
             return true;
         } else {
