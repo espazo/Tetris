@@ -1,4 +1,5 @@
 import {SquareGroup} from "./SquareGroup";
+import {Game} from "./Game";
 
 export interface Point {
     readonly x: number,
@@ -30,4 +31,14 @@ export interface IGameViewer {
     showNext(tetris: SquareGroup): void;
 
     switch(tetris: SquareGroup): void;
+
+    init(game: Game): void;
+
+    showScore(score: number): void;
+
+    onGamePause(): void;
+
+    onGameStart(): void;
+
+    onGameOver(): void;
 }

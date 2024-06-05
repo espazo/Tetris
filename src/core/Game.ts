@@ -10,13 +10,39 @@ export class Game {
     private _curTetris?: SquareGroup;
     private _nextTetris: SquareGroup;
     private _timer?: number;
-    private _during: number = 1000;
+    private _during: number;
     private _exists: Square[] = [];
     private _score: number = 0;
 
+    public get gameStatus() {
+        return this._gameStatus;
+    }
+
+    private get score() {
+        return this._score;
+    }
+
+    private set score(value) {
+        this._score = value;
+        this._viewer.showScore(value);
+        const level = GameConfig.levels.filter(it => it.score <= value).pop()!;
+        if (level.duration == this._during) {
+            return;
+        }
+        if (this._timer) {
+            this._during = level.duration;
+            clearInterval(this._timer);
+            this._timer = undefined;
+            this.autoDrop();
+        }
+    }
+
     constructor(private _viewer: IGameViewer) {
+        this._during = GameConfig.levels[0].duration;
         this._nextTetris = createTetris({x: 0, y: 0});
         this.createNext();
+        this._viewer.init(this);
+        this._viewer.showScore(this._score);
     }
 
     private createNext() {
@@ -30,7 +56,7 @@ export class Game {
         this._exists = [];
         this.createNext();
         this._curTetris = undefined;
-        this._score = 0;
+        this.score = 0;
     }
 
     start() {
@@ -45,6 +71,7 @@ export class Game {
             this.switchTetris();
         }
         this.autoDrop();
+        this._viewer.onGameStart();
     }
 
     pause() {
@@ -52,6 +79,7 @@ export class Game {
             this._gameStatus = GameStatus.pause;
             clearInterval(this._timer);
             this._timer = undefined;
+            this._viewer.onGamePause();
         }
     }
 
@@ -108,6 +136,7 @@ export class Game {
             this._gameStatus = GameStatus.over;
             clearInterval(this._timer);
             this._timer = undefined;
+            this._viewer.onGameOver();
             return;
         }
 
@@ -138,13 +167,13 @@ export class Game {
         if (lineNum == 0) {
             return;
         } else if (lineNum == 1) {
-            this._score += 10;
+            this.score += 10;
         } else if (lineNum == 2) {
-            this._score += 25;
+            this.score += 25;
         } else if (lineNum == 3) {
-            this._score += 50;
+            this.score += 50;
         } else {
-            this._score += 100;
+            this.score += 100;
         }
     }
 }
