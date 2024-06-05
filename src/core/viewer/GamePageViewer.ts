@@ -7,6 +7,11 @@ import GameConfig from "../GameConfig";
 import PageConfig from "./PageConfig";
 
 export class GamePageViewer implements IGameViewer {
+    private nextDom = $('#next');
+    private panelDom = $('#panel');
+    private scoreDom = $('#score');
+    private msgDom = $('#msg');
+
     showNext(tetris: SquareGroup): void {
         tetris.squares.forEach(sq => {
             sq.viewer = new SquarePageViewer(sq, this.nextDom);
@@ -19,11 +24,6 @@ export class GamePageViewer implements IGameViewer {
             sq.viewer = new SquarePageViewer(sq, this.panelDom);
         })
     }
-
-    private nextDom = $('#next');
-    private panelDom = $('#panel');
-    private scoreDom = $('#score');
-    private msgDom = $('#msg');
 
     init(game: Game): void {
         this.panelDom.css({
@@ -51,15 +51,14 @@ export class GamePageViewer implements IGameViewer {
                 case 40:
                     game.controlDown();
                     break;
-                case 32:
-                {
+                case 32: {
                     if (game.gameStatus == GameStatus.playing) {
                         game.pause();
                     } else {
                         game.start();
                     }
                 }
-                break;
+                    break;
             }
         });
     }
